@@ -1,0 +1,14 @@
+# dsh-task-atlas bundle patch
+#
+# Insert the plugin row into a profile's plugin roster. `dsh plugin add`
+# applies this patch automatically because package.json declares
+#   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+#
+# The single row mounts the host half (agent tools, storage domain, Markdown
+# export). The browser half is loaded from `exports["./client"]` under
+#   /plugins/dsh-task-atlas/client.js
+# because package.json declares
+#   "dsh": { "client": { "platform": "web" } }
+- insert:
+    - id: task-atlas
+      name: 'dsh-task-atlas'

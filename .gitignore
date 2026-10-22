@@ -1,0 +1,20 @@
+# build output
+lib/
+
+# dependencies
+node_modules/
+
+# scratch: downloaded official packages for API inspection
+.probe/
+
+# sandbox ACL diagnosis output
+.acl-recovery/
+.probe.txt
+
+# logs / OS junk
+*.log
+.DS_Store
+Thumbs.db
+
+# 插件写进工作区的本地镜像数据
+.dsh/
