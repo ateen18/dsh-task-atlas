@@ -45,6 +45,8 @@
 | pnpm | 下面所有命令都用它 |
 | DSH Desktop 或 `dsh web` | 实测于 `0.2.1-rc.2` |
 
+> **这个包还没发布到 npm。** `pnpm add dsh-task-atlas` 会直接 404（实测）。目前唯一的安装渠道就是下面这条：克隆 → 构建 → `link:` 进 profile。
+
 ### 五步
 
 **1. 克隆并构建**
@@ -190,7 +192,7 @@ Copy-Item -Recurse <克隆路径>\skills\task-atlas $HOME\.dsh\skills\
 ```sh
 pnpm install
 pnpm run typecheck    # tsc --noEmit
-pnpm test             # node --test test/*.test.ts（231 项）
+pnpm test             # node --test test/*.test.ts（273 项）
 pnpm run build        # tsdown + 客户端依赖护栏
 ```
 
