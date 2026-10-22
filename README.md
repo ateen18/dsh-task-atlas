@@ -37,27 +37,102 @@
 
 ## 安装
 
-尚未发布到 npm，从仓库装：
+### 前置
+
+| 需要 | 说明 |
+|---|---|
+| Node.js **≥ 22.19**（或 24+） | 仓库的 `engines` 要求 |
+| pnpm | 下面所有命令都用它 |
+| DSH Desktop 或 `dsh web` | 实测于 `0.2.1-rc.2` |
+
+### 五步
+
+**1. 克隆并构建**
 
 ```sh
 git clone https://github.com/ateen18/dsh-task-atlas.git
-cd ~/.dsh/profiles/desktop
-pnpm add link:<克隆下来的路径>
+cd dsh-task-atlas
+pnpm install
+pnpm run build
 ```
 
-然后在同目录的 `package.json` 里把 `dsh-task-atlas` 加进 `dsh.profile.bundles`，**退出应用再启动**（不是关窗口——关窗口只是收进托盘）。
+> **必须构建。** 仓库里没有 `lib/`（构建产物不进版本库），而 `package.json` 的 `main` 指向 `lib/index.js`。跳过这步，插件会加载失败。
 
-面板入口：左栏底部「▤ 任务图谱」，或右侧栏引导页的卡片。
+**2. 装进 profile**
 
-> 只装了插件没改 `bundles` 时，宿主按包名找不到它，重启后**面板直接不出现且不报错**。这是安装环节唯一容易漏的一步。
+```sh
+cd ~/.dsh/profiles/desktop
+pnpm add link:<克隆下来的绝对路径>
+```
+
+**3. 让 profile 加载它**
+
+编辑 `~/.dsh/profiles/desktop/package.json`，把包名加进 `dsh.profile.bundles`：
+
+```json
+{
+  "dsh": { "profile": { "bundles": [
+    "@deepseek-ai/dsh-base",
+    "@deepseek-ai/dsh-web-app",
+    "dsh-task-atlas"
+  ] } }
+}
+```
+
+> 只做了第 2 步、没做第 3 步时，宿主按包名找不到插件，**重启后面板直接不出现，也不报错**。这是安装环节唯一容易漏的一步。
+
+**4. 退出应用再启动**
+
+彻底退出（不是关窗口——关窗口只是收进托盘）。
+
+**5. 验证**
+
+左栏底部出现「▤ 任务图谱」，或右侧栏引导页出现卡片。
+
+### 为什么不直接 `pnpm add github:ateen18/dsh-task-atlas`
+
+试过，**在 pnpm 11 上不可靠**：
+
+```
+ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED
+The git-hosted package "dsh-task-atlas@0.0.1" needs to execute build scripts
+but is not in the "allowBuilds" allowlist.
+```
+
+pnpm 11 默认禁止运行 git 依赖的构建脚本（因为 `lib/` 不在仓库里，必须现场构建）。要这么装就得先在自己的 `pnpm-workspace.yaml` 里 allowlist 这个包，还得你的网络能连 GitHub。仓库里带了 `prepare` 脚本，`npm install` 从 git 装时能自动构建；pnpm 用户建议走上面的五步。
+
+### 升级
+
+```sh
+cd <克隆路径>
+git pull
+pnpm install && pnpm run build
+```
+
+然后重启应用。**改了源码必须重新 build**——装上的是 `lib/`，不是 `src/`。
+
+### 卸载
+
+```sh
+cd ~/.dsh/profiles/desktop
+pnpm remove dsh-task-atlas
+```
+
+再把 `dsh.profile.bundles` 里的 `dsh-task-atlas` 删掉，重启。
 
 ### 配套 skill（强烈建议）
 
-工具会自己说明用法，但**判断纪律**写在 skill 里：什么时候该拆、`result` 怎么写、为什么不能自己把节点标成需返工、以及**怎么对待 `[任务图谱]` 开头的那条消息**（它是插件生成的上下文，不是用户说的话）。
+工具会自己说明用法，但**判断纪律**写在 skill 里：什么时候该拆、`result` 怎么写、为什么不能自己把节点标成需返工、核心产出要登记成可点的把手、以及**怎么对待 `[任务图谱]` 开头的那条消息**（它是插件生成的上下文，不是用户说的话）。
 
 ```sh
 mkdir -p ~/.dsh/skills
-cp -r skills/task-atlas ~/.dsh/skills/
+cp -r <克隆路径>/skills/task-atlas ~/.dsh/skills/
+```
+
+Windows PowerShell 等价写法（`cp -r` 在 PowerShell 里能用，但参数解析靠缩写，容易踩坑）：
+
+```powershell
+Copy-Item -Recurse <克隆路径>\skills\task-atlas $HOME\.dsh\skills\
 ```
 
 ## 工具（15 个）
