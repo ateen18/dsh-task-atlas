@@ -4,6 +4,14 @@
   "description": "Project breakdown + structured task tree for DeepSeek Harness: a pinned right-sidebar tree with status semantics (rework / blocked / dropped, each with a reason), explicit branch provenance, prerequisites with what they provide, and re-openable outputs per node.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ateen18/dsh-task-atlas.git"
+  },
+  "homepage": "https://github.com/ateen18/dsh-task-atlas#readme",
+  "bugs": {
+    "url": "https://github.com/ateen18/dsh-task-atlas/issues"
+  },
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
   },

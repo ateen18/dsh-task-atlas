@@ -1,0 +1,8 @@
+# 统一用 LF：否则 Windows 上每次提交都会整文件重写，diff 全是噪音。
+* text=auto eol=lf
+
+# 二进制文件不要做换行转换
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
