@@ -37,16 +37,19 @@
 
 ## 安装
 
-本版本尚未发布到 npm，用本地 link 安装：
+尚未发布到 npm，从仓库装：
 
 ```sh
+git clone https://github.com/ateen18/dsh-task-atlas.git
 cd ~/.dsh/profiles/desktop
-pnpm add link:<仓库路径>
+pnpm add link:<克隆下来的路径>
 ```
 
 然后在同目录的 `package.json` 里把 `dsh-task-atlas` 加进 `dsh.profile.bundles`，**退出应用再启动**（不是关窗口——关窗口只是收进托盘）。
 
 面板入口：左栏底部「▤ 任务图谱」，或右侧栏引导页的卡片。
+
+> 只装了插件没改 `bundles` 时，宿主按包名找不到它，重启后**面板直接不出现且不报错**。这是安装环节唯一容易漏的一步。
 
 ### 配套 skill（强烈建议）
 
