@@ -81,7 +81,8 @@
     "build": "tsdown && node scripts/check-client-bundle.mjs",
     "watch": "tsdown --watch",
     "typecheck": "tsc --noEmit",
-    "test": "node --test \"test/*.test.ts\""
+    "test": "node --test \"test/*.test.ts\"",
+    "prepare": "tsdown && node scripts/check-client-bundle.mjs"
   },
   "keywords": [
     "dsh",
