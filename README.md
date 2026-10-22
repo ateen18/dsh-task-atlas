@@ -45,9 +45,30 @@
 | pnpm | 下面所有命令都用它 |
 | DSH Desktop 或 `dsh web` | 实测于 `0.2.1-rc.2` |
 
-> **这个包还没发布到 npm。** `pnpm add dsh-task-atlas` 会直接 404（实测）。目前唯一的安装渠道就是下面这条：克隆 → 构建 → `link:` 进 profile。
+### 方式一：让 agent 装（推荐，一条口令）
 
-### 五步
+把下面这段原样发给你的 DSH agent：
+
+```text
+帮我安装 DSH 插件「任务图谱」（dsh-task-atlas），仓库是 https://github.com/ateen18/dsh-task-atlas
+按这个顺序做，每步做完告诉我结果：
+
+1. 克隆到 ~/dsh-plugins/dsh-task-atlas（目录不存在就先建）。如果 HTTPS 连不上 GitHub，改用 git@github.com:ateen18/dsh-task-atlas.git。
+2. 在克隆目录里执行 pnpm install，然后 pnpm run build。
+   这一步不能省：仓库里没有 lib/（构建产物不进版本库），而 package.json 的 main 指向 lib/index.js，跳过它插件会加载失败。
+3. 进入 ~/.dsh/profiles/desktop，执行 pnpm add link:<克隆目录的绝对路径>。
+   如果你用的是 web profile，把 desktop 换成 web。
+4. 编辑同目录的 package.json，把 "dsh-task-atlas" 加进 dsh.profile.bundles 数组；已经在里面就不要重复加。
+   漏了这一步，宿主按包名找不到插件，重启后面板不出现也不报错。
+5. 可选：把 <克隆目录>/skills/task-atlas 整个目录复制到 ~/.dsh/skills/，这是配套的 skill。
+
+装完请报告三件事：lib/index.js 是否存在、profile 的 bundles 里是否已包含 dsh-task-atlas、以及我接下来该怎么重启应用。
+不要用 pnpm add dsh-task-atlas —— 这个包没有发布到 npm，会 404。也不要改动存储域名 dsh_task_atlas 或工作区里的 .dsh/task-atlas.* 文件，那些是已有数据。
+```
+
+agent 做完后，你只需要**彻底退出应用再启动**（关窗口只是收进托盘）。
+
+### 方式二：自己装（五步）
 
 **1. 克隆并构建**
 
@@ -137,7 +158,7 @@ Windows PowerShell 等价写法（`cp -r` 在 PowerShell 里能用，但参数�
 Copy-Item -Recurse <克隆路径>\skills\task-atlas $HOME\.dsh\skills\
 ```
 
-## 工具（15 个）
+## 工具（19 个）
 
 | 工具 | 权限 | 作用 |
 |---|---|---|
@@ -145,15 +166,18 @@ Copy-Item -Recurse <克隆路径>\skills\task-atlas $HOME\.dsh\skills\
 | `atlas_breakdown_draft` | — | 校验拆解草案，不落盘 |
 | `atlas_breakdown_confirm` | — | 建项目 + 落拆解 + 按拆解建模块 |
 | `atlas_breakdown_amend` | AI 自主 | 修订拆解，**必须写 reason**，逐字段记录「原来 → 现在」 |
-| `atlas_node_add` / `atlas_node_update` | AI 自主 | 增改节点（层级由父节点强制；update 可设 `dependsOn`，整体替换） |
+| `atlas_node_add` / `atlas_node_update` | AI 自主 | 增改节点（层级由父节点强制；可设 `needs` 开工条件与 `dependsOn` 前置，整体替换） |
 | `atlas_node_move` | AI 自主 | 连带子树挪到新父节点；层级按位置重算，状态与历史保留 |
 | `atlas_focus` | AI 自主 | 声明「现在在做这个」 |
 | `atlas_node_done` | AI 自主 | 完成，`result` 必填 |
 | `atlas_node_status` | **分级** | `active`/`pending` 自主；`rework`/`blocked`/`dropped` 需你确认；`dropped → active` 恢复同样需确认 |
 | `atlas_confirm` | 用户授权 | 应用一条待确认 |
 | `atlas_branch_create` / `atlas_branch_resolve` | AI 自主 | 分支登记与合回 |
+| `atlas_output_add` / `atlas_output_remove` | AI 自主 | 节点产出的**可打开把手**（URL / 文件 / 目录）；同一地址重复登记会覆盖 |
 | `atlas_node_delete` | 安全阀 | 只删「从未承载过决定」的节点 |
 | `atlas_workspace_history` | 读 | 开工前判定这个工作区有没有前情 |
+| `atlas_tidy_titles` | AI 自主 | 把写成句子的标题收紧成短标签，解释移进说明；默认只报告，`apply: true` 才落盘 |
+| `atlas_restore` | 用户授权 | 从 `<工作区>/.dsh/task-atlas.json` 恢复整份图谱；非空时需显式 `overwrite` |
 
 ## 配置
 
