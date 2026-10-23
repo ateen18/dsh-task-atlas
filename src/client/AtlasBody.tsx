@@ -6,9 +6,11 @@
  * waiting for you next, then the plan — because the panel is read while
  * distracted, mid-task.
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
+import { Component, useEffect, useMemo, useRef, useState } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { collectNodes, findNode, pathOf, progressOf } from '../model/tree.ts'
+import { CanvasView } from './canvas-view.tsx'
+import { LAYOUT_VERSION } from './canvas-layout.ts'
 import { shortLabel } from '../model/title.ts'
 import { unmetNeeds } from '../model/needs.ts'
 import { outputsLine } from '../model/outputs.ts'
@@ -29,8 +31,11 @@ const VIEW_KEY = 'dsh-task-atlas:view'
  * `tree` — what is under what, and what is wrong with it; `graph` — what waits for
  * what; `progress` — how far along, and what changed.
  */
-/** Two views: the tree is for working, the progress list is for reading the shape of the run. */
-type AtlasView = 'tree' | 'progress'
+/**
+ * Three views: the tree is for working, the progress list reports the run, and the canvas is
+ * where dependencies become readable.
+ */
+type AtlasView = 'tree' | 'progress' | 'canvas'
 
 const root: CSSProperties = {
   display: 'flex',
@@ -95,6 +100,22 @@ export interface AtlasBodyProps {
    * than assuming it exists.
    */
   readonly inputActions?: InputActionsLike
+  /**
+   * Ask the shell for a wider column, called when the user opens the dependency canvas.
+   *
+   * Provided by the registration site, which has the sidebar service; optional so the body
+   * still renders (just narrower) when it is absent.
+   */
+  readonly onExpand?: () => void
+  /**
+   * Presentation override, when a host chooses to pass one.
+   *
+   * The real decision is made from the measured width of this panel (see `AtlasBodyInner`):
+   * the slot's own presentation flag arrives through a hook prop that throws while the tab is
+   * not yet committed, and calling it under `try/catch` corrupts React's hook order — that
+   * mistake blanked the panel once. Width is the condition that matters anyway.
+   */
+  readonly fullscreen?: boolean
 }
 
 /** The slice of the shell's input actions this panel uses. */
@@ -271,6 +292,13 @@ function NodeDetail({
   readonly node: AtlasNode
   readonly onSelect: (id: string) => void
   readonly inputActions?: InputActionsLike
+  /**
+   * Ask the shell for a wider column, called when the user opens the dependency canvas.
+   *
+   * Provided by the registration site, which has the sidebar service; optional so the body
+   * still renders (just narrower) when it is absent.
+   */
+  readonly onExpand?: () => void
 }) {
   const [feedback, setFeedback] = useState<'sent' | 'copied' | 'failed' | null>(null)
   const label = shortLabel(node.title)
@@ -563,13 +591,74 @@ const STATUSBAR = 'var(--dsw-alias-accent, #2f81f7)'
  * @param props - owner props; `sessionId` selects the workspace to show.
  */
 export function AtlasBody(props: AtlasBodyProps) {
+  return (
+    <BodyBoundary>
+      <AtlasBodyInner {...props} />
+    </BodyBoundary>
+  )
+}
+
+/**
+ * Keep a crash inside the body from emptying the panel.
+ *
+ * An error thrown while rendering a slot body removes that body from the slot, and the user
+ * sees an empty column with no explanation — which reads as "my plan was deleted". A boundary
+ * costs a few lines and turns that into a visible message with a retry.
+ */
+class BodyBoundary extends Component<
+  { readonly children: ReactNode },
+  { readonly error: Error | null; readonly attempt: number }
+> {
+  constructor(init: { readonly children: ReactNode }) {
+    super(init)
+    this.state = { error: null, attempt: 0 }
+  }
+
+  static getDerivedStateFromError(error: Error): { error: Error } {
+    return { error }
+  }
+
+  override componentDidCatch(error: Error): void {
+    if (typeof console !== 'undefined') console.error('[task-atlas] panel crashed', error)
+  }
+
+  override render(): ReactNode {
+    if (!this.state.error) return this.props.children
+    return (
+      <div data-plugin="dsh-task-atlas" style={{ ...root, gap: 8 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 650 }}>任务图谱</div>
+        <div style={{ ...card, borderColor: STATUS_COLOR.blocked }}>
+          <div style={{ fontSize: 12 }}>面板渲染出错了（数据没有丢）</div>
+          <div style={muted}>{this.state.error.message}</div>
+          <button
+            style={button}
+            onClick={() => this.setState((current) => ({ error: null, attempt: current.attempt + 1 }))}
+          >
+            重试
+          </button>
+        </div>
+      </div>
+    )
+  }
+}
+
+/** The real body, with the crash boundary above it. */
+function AtlasBodyInner(props: AtlasBodyProps) {
   const feed = useAtlasState(props.sessionId)
+  /**
+   * The view is the entry point, not the panel's width.
+   *
+   * An earlier attempt gated the canvas on measured width so it would only appear when there
+   * was room — that made the feature unreachable without knowing it existed. The toolbar's
+   * 「依赖图」 button is the entry instead (it also asks the shell to widen the column); width
+   * only affects how comfortable the result is.
+   */
+  const panel = useRef<HTMLDivElement | null>(null)
   const [view, setView] = useState<AtlasView>(() => {
     try {
       const saved = localStorage.getItem(VIEW_KEY)
-      // 'graph' and 'map' were retired views. A preference stored back then falls back to
-      // the tree instead of pretending the old view still exists.
-      if (saved === 'graph' || saved === 'map') return 'tree'
+      // 'graph'/'map' were the old names of this same view, so a stored preference still works.
+      if (saved === 'graph' || saved === 'map') return 'canvas'
       return saved === 'progress' ? 'progress' : 'tree'
     } catch {
       return 'tree'
@@ -634,7 +723,7 @@ export function AtlasBody(props: AtlasBodyProps) {
 
   if (!project) {
     return (
-      <div data-plugin="dsh-task-atlas" style={root}>
+      <div ref={panel} data-plugin="dsh-task-atlas" style={root}>
         <div style={{ fontSize: 13.5, fontWeight: 650 }}>任务图谱</div>
         {feed.error ? (
           <div style={{ ...card, borderColor: STATUS_COLOR.blocked }}>
@@ -655,26 +744,83 @@ export function AtlasBody(props: AtlasBodyProps) {
 
   const total = collectNodes(project.root).length
 
-  return (
-    <div data-plugin="dsh-task-atlas" style={root}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ fontSize: 13.5, fontWeight: 650, flex: 1 }}>任务图谱</span>
-        <button
-          style={{ ...button, background: view === 'tree' ? 'rgba(128,128,128,0.18)' : 'transparent' }}
-          onClick={() => switchView('tree')}
-        >
-          树
-        </button>
-        <button
-          style={{
-            ...button,
-            background: view === 'progress' ? 'rgba(128,128,128,0.18)' : 'transparent',
-          }}
-          onClick={() => switchView('progress')}
-        >
-          进展
-        </button>
+  // One toolbar for both presentations: the canvas is a view you can always get back from, not
+  // a mode that traps you.
+  const toolbar = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <span style={{ fontSize: 13.5, fontWeight: 650, flex: 1 }}>任务图谱</span>
+      <button
+        style={{ ...button, background: view === 'tree' ? 'rgba(128,128,128,0.18)' : 'transparent' }}
+        onClick={() => switchView('tree')}
+      >
+        树
+      </button>
+      <button
+        style={{
+          ...button,
+          background: view === 'progress' ? 'rgba(128,128,128,0.18)' : 'transparent',
+        }}
+        onClick={() => switchView('progress')}
+      >
+        进展
+      </button>
+      <button
+        style={{
+          ...button,
+          background: view === 'canvas' ? 'rgba(128,128,128,0.18)' : 'transparent',
+        }}
+        // An explicit entry that also asks for the room the canvas needs. A view nobody can
+        // find is not a feature; a canvas squeezed into a 400 px column is not readable.
+        onClick={() => {
+          props.onExpand?.()
+          switchView('canvas')
+        }}
+        title="依赖画布：谁需要谁、需要什么"
+      >
+        依赖图
+      </button>
+    </div>
+  )
+
+  if (view === 'canvas') {
+    return (
+      <div
+        ref={panel}
+        data-plugin="dsh-task-atlas"
+        style={{ ...root, height: '100%', gap: 6, overflow: 'hidden' }}
+      >
+        {toolbar}
+        <div style={{ ...tiny, flexShrink: 0 }}>
+          {project.title} · 拖动卡片调整位置，滚轮缩放；点「树」回到列表
+        </div>
+        {/*
+         * `position: relative` is load-bearing: the canvas surface inside is
+         * `position: absolute; inset: 0`, and without a positioned parent here it anchors to
+         * the tab body instead — which drew the graph straight over the title and the view
+         * switch.
+         */}
+        <div style={{ flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>
+          <CanvasView
+            project={project}
+            // Positions from a superseded arrangement are ignored, not applied: they belong to
+            // a layout that no longer exists.
+            layout={
+              feed.state?.document.layoutVersion === LAYOUT_VERSION
+                ? feed.state?.document.layout
+                : undefined
+            }
+            onSaveLayout={(positions) => void feed.saveLayout(positions)}
+            selectedId={selected}
+            onSelect={setSelected}
+          />
+        </div>
       </div>
+    )
+  }
+
+  return (
+    <div ref={panel} data-plugin="dsh-task-atlas" style={root}>
+      {toolbar}
 
       <ProjectHeader project={project} />
 
@@ -852,6 +998,13 @@ function TopicStrip({
   readonly topic: { readonly streak: number; readonly flagged: boolean; readonly sample?: string } | null
   readonly steps: number
   readonly inputActions?: InputActionsLike
+  /**
+   * Ask the shell for a wider column, called when the user opens the dependency canvas.
+   *
+   * Provided by the registration site, which has the sidebar service; optional so the body
+   * still renders (just narrower) when it is absent.
+   */
+  readonly onExpand?: () => void
 }) {
   const [dismissed, setDismissed] = useState(false)
   const [sent, setSent] = useState(false)

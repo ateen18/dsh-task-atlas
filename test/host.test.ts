@@ -440,6 +440,54 @@ describe('panel routes', () => {
     assert.equal(missingArg.state.status, 400)
   })
 
+  it('persists canvas positions without touching node timestamps', async () => {
+    const h = harness()
+    const cwd = 'D:\\proj'
+    // Positions are only meaningful once a plan exists; the route refuses to create a
+    // document just to hold them.
+    await h.store.update(workspaceKeyOf(cwd), (document) => ({ ...document, activeProjectId: null }))
+    const { res, state } = makeRes()
+    await h.handler(
+      makeReq('POST', '/task-atlas/layout', {
+        cwd,
+        positions: { 'm-1': { x: 120.4, y: 40 }, 'm-2': { x: 'nope', y: 1 } },
+      }),
+      res,
+    )
+    assert.equal(state.status, 200)
+    const body = JSON.parse(state.body) as { ok: boolean; count: number }
+    assert.equal(body.ok, true)
+    // An invalid point is dropped rather than stored as NaN.
+    assert.equal(body.count, 1)
+
+    const stored = await h.store.read(workspaceKeyOf(cwd))
+    assert.deepEqual(stored?.layout, { 'm-1': { x: 120, y: 40 } })
+    // A layout save must not invent a project, and must not touch the plan: positions are
+    // view state, so nothing here can look like an edit to the work.
+    assert.equal(stored?.projects.length, 0)
+  })
+
+  it('400s a layout save with no positions', async () => {
+    const h = harness()
+    await h.store.update(workspaceKeyOf('D:\\proj'), (document) => document)
+    const missing = makeRes()
+    await h.handler(makeReq('POST', '/task-atlas/layout', { cwd: 'D:\\proj' }), missing.res)
+    assert.equal(missing.state.status, 400)
+  })
+
+  it('refuses to save positions for a workspace with no plan', async () => {
+    const h = harness()
+    const { res, state } = makeRes()
+    await h.handler(
+      makeReq('POST', '/task-atlas/layout', { cwd: 'D:\\empty-ws', positions: { a: { x: 1, y: 2 } } }),
+      res,
+    )
+    assert.equal(state.status, 409)
+    assert.equal((JSON.parse(state.body) as { code: string }).code, 'NO_DOCUMENT')
+    // And it did not create the document it refused to write to.
+    assert.equal(await h.store.read(workspaceKeyOf('D:\\empty-ws')), undefined)
+  })
+
   it('unregisters cleanly', () => {
     const h = harness()
     h.dispose()

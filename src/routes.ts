@@ -56,6 +56,13 @@ export interface RouteDeps {
    */
   readonly buildInfo?: () => { readonly at: number; readonly startedAt: number } | undefined
   /**
+   * Announce that the document changed.
+   *
+   * Used by writes that do not go through the tool layer — the canvas position save is the
+   * only one — so the panel's other viewers refetch instead of waiting for the next turn.
+   */
+  readonly notify?: () => void
+  /**
    * How long one long-poll may wait before answering "nothing changed".
    *
    * Exposed mainly so tests do not have to wait 25 seconds to exercise the timeout
@@ -334,6 +341,73 @@ export function installRoutes(host: RouteHost, deps: RouteDeps): () => void {
               history: history ?? null,
               builtin: sessionId ? (deps.builtin.get(sessionId) ?? null) : null,
             })
+            return
+          }
+
+          // Canvas positions. A view adjustment, not a plan change — so it never touches
+          // node `updatedAt`, and a merge can never read a drag as an edit to the work.
+          if (req.method === 'POST' && url.startsWith(`${ROUTE_PREFIX}/layout`)) {
+            const body = await readJsonBody(req)
+            const record = (typeof body === 'object' && body !== null ? body : {}) as Record<
+              string,
+              unknown
+            >
+            const sessionId = asString(record.sessionId)
+            const explicitCwd = asString(record.cwd)
+            const resolved = await resolveWorkspace(sessionId, explicitCwd, deps)
+            if (!resolved?.workspaceKey) {
+              sendJson(res, 400, {
+                ok: false,
+                code: 'NO_WORKSPACE',
+                summary: '无法确定工作区。',
+              })
+              return
+            }
+            // `via: 'latest'` means "guessed from another session". Acceptable for showing a
+            // snapshot, wrong for a write — it already put this workspace's positions into a
+            // different workspace's document once.
+            if (resolved.via === 'latest') {
+              sendJson(res, 409, {
+                ok: false,
+                code: 'UNSURE_WORKSPACE',
+                summary: '无法确定这是哪个工作区，暂不保存画布位置。',
+              })
+              return
+            }
+            // Never create a document just to hold positions: no plan means nothing to position.
+            if (!(await deps.store.read(resolved.workspaceKey))) {
+              sendJson(res, 409, {
+                ok: false,
+                code: 'NO_DOCUMENT',
+                summary: '这个工作区还没有图谱，不需要保存布局。',
+              })
+              return
+            }
+            const positions = record.positions
+            if (typeof positions !== 'object' || positions === null) {
+              sendJson(res, 400, {
+                ok: false,
+                code: 'MISSING_ARGUMENT',
+                summary: '缺少 positions。',
+              })
+              return
+            }
+            const cleaned: Record<string, { x: number; y: number }> = {}
+            for (const [id, point] of Object.entries(positions as Record<string, unknown>)) {
+              if (typeof point !== 'object' || point === null) continue
+              const { x, y } = point as { x?: unknown; y?: unknown }
+              if (typeof x !== 'number' || typeof y !== 'number') continue
+              if (!Number.isFinite(x) || !Number.isFinite(y)) continue
+              cleaned[id] = { x: Math.round(x), y: Math.round(y) }
+            }
+            const version = typeof record.version === 'number' ? record.version : undefined
+            await deps.store.update(resolved.workspaceKey, (document) => ({
+              ...document,
+              layout: cleaned,
+              ...(version === undefined ? {} : { layoutVersion: version }),
+            }))
+            deps.notify?.()
+            sendJson(res, 200, { ok: true, count: Object.keys(cleaned).length })
             return
           }
 

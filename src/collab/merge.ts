@@ -18,6 +18,7 @@
  */
 import type {
   AtlasDocument,
+  CanvasPoint,
   AtlasNode,
   AtlasProject,
   Breakdown,
@@ -338,11 +339,27 @@ export function mergeDocuments(
       ...(mergeParticipants(local.participants, remote.participants) === undefined
         ? {}
         : { participants: mergeParticipants(local.participants, remote.participants) }),
+      // Positions are unioned with local priority: you keep the cards you moved, and gain
+      // placements for nodes you never touched. A layout conflict is not worth a human's
+      // attention, so it never becomes a conflict entry.
+      ...(mergeLayout(local.layout, remote.layout) === undefined
+        ? {}
+        : { layout: mergeLayout(local.layout, remote.layout) }),
       ...(at === 0 ? {} : {}),
     },
     conflicts,
     stats,
   }
+}
+
+
+/** Union two canvases by node id, preferring the local position. */
+function mergeLayout(
+  local: Readonly<Record<string, CanvasPoint>> | undefined,
+  remote: Readonly<Record<string, CanvasPoint>> | undefined,
+): Readonly<Record<string, CanvasPoint>> | undefined {
+  if (!local && !remote) return undefined
+  return { ...(remote ?? {}), ...(local ?? {}) }
 }
 
 function indexProjects(document: AtlasDocument | undefined): Map<string, AtlasProject> {

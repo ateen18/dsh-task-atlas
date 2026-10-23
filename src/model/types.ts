@@ -297,4 +297,30 @@ export interface AtlasDocument {
    * Absent on every document written before sharing existed, which reads as "just me".
    */
   readonly participants?: readonly Participant[]
+  /**
+   * Canvas positions, by node id.
+   *
+   * A document-level object rather than a field on each node on purpose: moving a card is a
+   * view adjustment, not an edit to the work. Keeping it separate means (a) merging never
+   * mistakes a drag for a change to a node, and (b) two people looking at the same graph see
+   * it in the same shape — which is the only way "look at that wire" means anything shared.
+   *
+   * Absent means "never laid out"; the canvas then derives an automatic arrangement.
+   */
+  readonly layout?: Readonly<Record<string, CanvasPoint>>
+  /**
+   * Which arrangement produced {@link layout}.
+   *
+   * Positions only mean something relative to the layout that generated the rest of them. When
+   * the canvas changed from a layered graph to a mind map, eleven saved coordinates from the old
+   * model stayed behind and dragged those cards into the middle of the new tree. A version turns
+   * that into "ignore the old positions" instead of "wonder why the picture is scrambled".
+   */
+  readonly layoutVersion?: number
+}
+
+/** One position on the dependency canvas. */
+export interface CanvasPoint {
+  readonly x: number
+  readonly y: number
 }

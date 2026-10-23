@@ -28,6 +28,14 @@ export const STATUS_LABEL: Readonly<Record<NodeStatus, string>> = {
 }
 
 /**
+ * The colour of "what I am working on right now", with a literal fallback.
+ *
+ * Deliberately outside the status palette: the focus marker must never read as a status, and the
+ * previous halo reused the status hue — so a finished node and the live node looked alike.
+ */
+export const FOCUS_COLOR = '#b91c1c'
+
+/**
  * Accent colour per status, expressed with theme tokens and a literal fallback.
  * `dropped` is intentionally low-contrast: abandoned work should recede.
  */

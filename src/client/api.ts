@@ -11,6 +11,7 @@
  * cannot be established, and at 30 s it is a safety net rather than a heartbeat.
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { LAYOUT_VERSION } from './canvas-layout.ts'
 import type { AtlasDocument } from '../model/types.ts'
 import type { BuiltinPlan } from '../builtin-plan.ts'
 import type { WorkspaceHistory } from '../workspace-history.ts'
@@ -107,6 +108,11 @@ function confirmUrl(): string {
   return new URL('task-atlas/confirm', document.baseURI).toString()
 }
 
+/** Where canvas positions are written. */
+function layoutUrl(): string {
+  return new URL('task-atlas/layout', document.baseURI).toString()
+}
+
 /** The long-poll endpoint: answers when the document changes, or at a ceiling. */
 function waitUrl(revision: number, sessionId: string | undefined): string {
   const url = new URL('task-atlas/wait', document.baseURI)
@@ -124,6 +130,8 @@ export interface AtlasFeed {
   readonly reload: () => void
   /** Apply one queued confirmation. */
   readonly confirm: (confirmationId: string) => Promise<void>
+  /** Persist canvas positions (debounced by the caller). */
+  readonly saveLayout: (positions: Record<string, { x: number; y: number }>) => Promise<void>
   /** The confirmation id currently in flight, for per-row spinners. */
   readonly busy: string | null
 }
@@ -305,5 +313,26 @@ export function useAtlasState(sessionId: string | undefined): AtlasFeed {
     [sessionId],
   )
 
-  return { state, error, loading, reload, confirm, busy }
+  /**
+   * Persist canvas positions.
+   *
+   * Deliberately silent on failure: losing a card position is not worth an error banner over
+   * the graph, and the next drag retries anyway.
+   */
+  const saveLayout = useCallback(
+    async (positions: Record<string, { x: number; y: number }>): Promise<void> => {
+      try {
+        await fetch(layoutUrl(), {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ sessionId, positions, version: LAYOUT_VERSION }),
+        })
+      } catch {
+        /* the canvas keeps working from local state */
+      }
+    },
+    [sessionId],
+  )
+
+  return { state, error, loading, reload, confirm, saveLayout, busy }
 }

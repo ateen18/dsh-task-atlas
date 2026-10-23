@@ -548,6 +548,7 @@ async function startAtlas(ctx: Context, config: Config): Promise<void> {
       startupFailure: () => failure,
       subscribe: (listener) => changes.subscribe(listener),
       revision: () => changes.revision,
+      notify: () => changes.notify(),
       buildInfo: () => buildInfo(),
       stepsSinceAtlas: (sessionId) => drift.stepsOf(sessionId),
       topicOf: (sessionId) => topic.stateOf(sessionId),

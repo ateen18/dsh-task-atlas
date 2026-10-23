@@ -11,7 +11,7 @@ import type { CSSProperties } from 'react'
 import { collectNodes } from '../model/tree.ts'
 import type { AtlasNode, AtlasProject } from '../model/types.ts'
 import { shortLabel } from '../model/title.ts'
-import { STATUS_COLOR, STATUS_LABEL, STATUS_TINT } from './labels.ts'
+import { FOCUS_COLOR, STATUS_COLOR, STATUS_LABEL, STATUS_TINT } from './labels.ts'
 
 const row: CSSProperties = {
   display: 'flex',
@@ -158,19 +158,35 @@ export function TreeView(props: TreeViewProps) {
         >
           {node.children.length === 0 ? '·' : isCollapsed ? '▸' : '▾'}
         </span>
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            marginTop: 6,
-            flexShrink: 0,
-            background: STATUS_COLOR[node.status],
-            // The current node gets a halo so "where am I" needs no reading.
-            boxShadow: focused ? `0 0 0 2px ${STATUS_COLOR[node.status]}` : undefined,
-          }}
-          title={STATUS_LABEL[node.status]}
-        />
+        {focused ? (
+          // A star, not a haloed dot: the halo was the same hue as the status dot, so "the node
+          // I am working on" and "a node that happens to be done" looked alike. Shape separates
+          // them at a glance; colour says it is the live one.
+          <span
+            style={{
+              flexShrink: 0,
+              marginTop: 1,
+              fontSize: 12,
+              lineHeight: '14px',
+              color: FOCUS_COLOR,
+            }}
+            title="当前在做的节点"
+          >
+            ★
+          </span>
+        ) : (
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              marginTop: 6,
+              flexShrink: 0,
+              background: STATUS_COLOR[node.status],
+            }}
+            title={STATUS_LABEL[node.status]}
+          />
+        )}
         <span style={titleText}>{shortLabel(node.title).label}</span>
         {node.branch ? <span style={badge}>⑂ 分支</span> : null}
         {/* Upstream count, so "what this waits for" is visible in the tree too and

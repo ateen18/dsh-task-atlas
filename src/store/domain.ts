@@ -169,6 +169,8 @@ export const atlasDocumentSchema: z.ZodType<AtlasDocument> = z.object({
   activeProjectId: z.string().nullable(),
   projects: z.array(projectSchema),
   pending: z.array(pendingSchema),
+  layout: z.record(z.string(), z.object({ x: z.number(), y: z.number() })).optional(),
+  layoutVersion: z.number().optional(),
 }) as z.ZodType<AtlasDocument>
 
 const documentSchema = atlasDocumentSchema

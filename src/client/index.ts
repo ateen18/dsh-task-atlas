@@ -14,6 +14,7 @@
  * pushed into the body by the framework through `useTabInfo()`; components never
  * receive `ctx`.
  */
+import { createElement } from 'react'
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
@@ -66,12 +67,29 @@ export function apply(ctx: Context): void {
   )
 
   // ---- stage 2: the tab body ----------------------------------------------
+  /**
+   * The body, plus the one shell action it cannot reach itself.
+   *
+   * Opening the dependency canvas wants a wider column. `ctx.sidebarRight` is only available
+   * here (components never receive `ctx`), so the widening request is passed in as a prop
+   * rather than reached for from inside the render.
+   */
+  const BodyWithShell = (props: Parameters<typeof AtlasBody>[0]) => {
+    const expand = (): void => {
+      try {
+        if (!ctx.sidebarRight.isExpanded()) ctx.sidebarRight.toggleExpanded()
+      } catch {
+        // No session on screen: the canvas still opens, just at the width it has.
+      }
+    }
+    return createElement(AtlasBody, { ...props, onExpand: expand })
+  }
   ctx.effect(
     () =>
       ctx.slots.inject('sidebar.right.pane.tab', () =>
         ctx.slots.register(
           { name: 'sidebar.right.pane.tab', key: TAB_TYPE_ID },
-          AtlasBody,
+          BodyWithShell,
         ),
       ),
     'task-atlas: tab body',

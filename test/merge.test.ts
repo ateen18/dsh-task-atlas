@@ -174,3 +174,17 @@ describe('merging two copies', () => {
     assert.equal(merged.activeProjectId, 'p-1')
   })
 })
+  it('unions canvas positions, keeping the local one on a clash', () => {
+    const base = document([{ id: 'a', title: '甲' }], AT)
+    const local: AtlasDocument = { ...base, layout: { a: { x: 10, y: 10 } } }
+    const remote: AtlasDocument = { ...base, layout: { a: { x: 99, y: 99 }, b: { x: 5, y: 5 } } }
+    const merged = mergeDocuments(undefined, local, remote, AT).document
+    assert.deepEqual(merged.layout, { a: { x: 10, y: 10 }, b: { x: 5, y: 5 } })
+  })
+
+  it('never reports a layout clash as a conflict', () => {
+    const base = document([{ id: 'a', title: '甲' }], AT)
+    const local: AtlasDocument = { ...base, layout: { a: { x: 10, y: 10 } } }
+    const remote: AtlasDocument = { ...base, layout: { a: { x: 99, y: 99 } } }
+    assert.equal(mergeDocuments(undefined, local, remote, AT).conflicts.length, 0)
+  })
