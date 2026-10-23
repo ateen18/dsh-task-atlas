@@ -1,5 +1,7 @@
 # dsh-task-atlas · 任务图谱
 
+[![CI](https://github.com/ateen18/dsh-task-atlas/actions/workflows/ci.yml/badge.svg)](https://github.com/ateen18/dsh-task-atlas/actions/workflows/ci.yml)
+
 给 DeepSeek Harness 的**项目拆解 + 任务树**，同时服务于两个人：你和 AI。
 
 它解决的是长对话里的一个具体失效：**上下文越长，主线越淡**。过程信息（报错、文件内容、试错）会把「原本要做什么、现在做到哪、这件事为什么在这儿」淹掉。人靠翻记录找不回来，模型靠读历史也抓不住。

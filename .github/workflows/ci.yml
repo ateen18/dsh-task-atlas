@@ -15,13 +15,13 @@ jobs:
     name: typecheck · test · build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: pnpm/action-setup@v4
         with:
           version: 11
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           # Node 24 strips TypeScript types natively, which is what the test runner relies on:
           # the tests import `src/**/*.ts` directly instead of a compiled copy.
