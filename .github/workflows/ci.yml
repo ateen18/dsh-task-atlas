@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# One run per ref: a new push cancels the previous in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: typecheck · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          # Node 24 strips TypeScript types natively, which is what the test runner relies on:
+          # the tests import `src/**/*.ts` directly instead of a compiled copy.
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Test
+        run: pnpm test
+
+      # The build is not just a bundle step: it also runs the client guard, which fails when a
+      # client artifact requires anything outside the platform module list. That mistake once
+      # made the whole app refuse to start, so it belongs in CI rather than in a habit.
+      - name: Build
+        run: pnpm run build
