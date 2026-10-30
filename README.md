@@ -2,21 +2,38 @@
 
 [![CI](https://github.com/ateen18/dsh-task-atlas/actions/workflows/ci.yml/badge.svg)](https://github.com/ateen18/dsh-task-atlas/actions/workflows/ci.yml)
 
+中文 · [English](README_EN.md)
+
 给 DeepSeek Harness 的**项目拆解 + 任务树**，同时服务于两个人：你和 AI。
 
 它解决的是长对话里的一个具体失效：**上下文越长，主线越淡**。过程信息（报错、文件内容、试错）会把「原本要做什么、现在做到哪、这件事为什么在这儿」淹掉。人靠翻记录找不回来，模型靠读历史也抓不住。
 
 所以插件做两件事：在右侧栏常驻一棵**跟着真实进展变化**的树，并在每一步开始前，把「当前在哪」用一小段话递给模型。
 
+<p align="center">
+  <img src="docs/images/loop.svg" width="760" alt="拆解 → 任务树 → 每步注入 → 模型；回合结束时回写真实进展"/>
+</p>
+
+> 图由插件自己的布局代码从代表性数据生成，不是截屏——所以它不会随着面板改版而过期，也不会画出代码产生不了的状态。
+
 ## 它做什么
 
 ### 给人看的
+
+<p align="center">
+  <img src="docs/images/panel.svg" width="420" alt="右侧栏面板：拆解在顶部、任务树带状态与原因、下方是节点详情卡"/>
+</p>
 
 - **拆解钉在顶部**：核心意图、核心交付物（含各自验收）、拆解清单、整体验收标准、明确不做什么、约束、优先级。开工时定一次，之后随时可看、可改（改动留修订历史）。
 - **三个视图**，各回答一个问题，渲染同一份数据：
   - **树**（默认）：密集、带原因、自动展开当前路径 —— 干活和扫问题用
   - **进展**：模块级进度条 + 变更时间线 —— 看走势用
   - **依赖图**：思维导图式的结构 + 彩色依赖线 —— 看全貌和"谁在等谁"用。层级用中性细线，依赖用琥珀色线；点一个节点，它等的和等它的节点一起点亮；分支可折叠
+
+<p align="center">
+  <img src="docs/images/canvas.svg" width="720" alt="依赖画布：树状结构 + 琥珀色依赖线；选中节点的上游一起点亮，其余变暗"/>
+</p>
+
 - **状态不止做完/没做完**：`未开始 / 进行中 / 已完成 / 需返工 / 阻塞 / 已废弃`。负向状态**强制写原因**并保留完整历史；乱序状态**必须你确认**才能生效。
 - **分支溯源**：临时插进来的事登记为分支，记住从哪分出、为什么分、什么条件回归、合回哪里。合回后节点保留。
 - **前置关系**：`B.dependsOn = [A]` 读作「A 是 B 的前置」。成环会被拒。每个前置还能带一句「需要 A 的什么」，所以连线不是"谁先谁后"的猜测，而是可核对的依赖。
@@ -220,7 +237,7 @@ Copy-Item -Recurse <克隆路径>\skills\task-atlas $HOME\.dsh\skills\
 ```sh
 pnpm install
 pnpm run typecheck    # tsc --noEmit
-pnpm test             # node --test test/*.test.ts（273 项）
+pnpm test             # node --test test/*.test.ts（289 项）
 pnpm run build        # tsdown + 客户端依赖护栏
 ```
 
@@ -229,6 +246,12 @@ pnpm run build        # tsdown + 客户端依赖护栏
 ```sh
 node scripts/check-storage.mjs            # 存储记录是否仍符合 schema，并打印项目/拆解/修订
 node scripts/check-running-build.mjs 端口  # 运行的进程是不是当前构建 + 路由是否真的应答
+```
+
+README 的配图是生成的，不是截屏：
+
+```sh
+node scripts/render-readme-images.mjs      # 重新生成 docs/images/*.svg
 ```
 
 `scripts/restart-desktop.ps1` **不再杀进程**。原因写在文件头：关窗口只是收进托盘，强杀宿主会让桌面端弹「host exited」错误框，而脚本本身又是宿主的子进程，会跟着一起死。
@@ -250,4 +273,34 @@ node scripts/check-running-build.mjs 端口  # 运行的进程是不是当前构
 
 ## 许可
 
-MIT
+MIT —— 全文见 [LICENSE](LICENSE)，这里是同一份文本：
+
+<details>
+<summary>MIT License</summary>
+
+```text
+MIT License
+
+Copyright (c) 2026 dsh-task-atlas contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+</details>
+

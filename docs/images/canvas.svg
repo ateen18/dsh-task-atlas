@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="800" viewBox="0 0 780 800" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<defs>
+  <marker id="dep-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L8,4 L0,8 Z" fill="#d97706"/>
+  </marker>
+</defs>
+<rect width="780" height="800" fill="#f6f8fa"/>
+<text x="24" y="28" font-size="12" fill="#6b7280">结构：项目 → 模块 → 任务（细线） 　依赖：谁等谁（<tspan fill="#d97706" font-weight="600">琥珀色</tspan>，点节点才显示）</text>
+<path d="M 174 323 C 212 323, 212 143, 250 143" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 174 323 C 212 323, 212 383, 250 383" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 174 323 C 212 323, 212 623, 250 623" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 380 143 C 425 143, 425 83, 470 83" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 380 143 C 425 143, 425 183, 470 183" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 380 143 C 425 143, 425 283, 470 283" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 380 383 C 425 383, 425 383, 470 383" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 380 383 C 425 383, 425 483, 470 483" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 380 623 C 425 623, 425 623, 470 623" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 380 623 C 425 623, 425 723, 470 723" fill="none" stroke="#d0d7de" stroke-width="1.2"/>
+<path d="M 610 383 C 706 383, 706 483, 610 483" fill="none" stroke="#d97706" stroke-width="1.9" marker-end="url(#dep-arrow)"/>
+      <text x="679.12" y="429" text-anchor="middle" font-size="9" fill="#d97706">注入通道与预算</text>
+<path d="M 610 623 C 706 623, 706 723, 610 723" fill="none" stroke="#d97706" stroke-width="1.9" marker-end="url(#dep-arrow)"/>
+      <text x="679.12" y="669" text-anchor="middle" font-size="9" fill="#d97706">树的序列化结构</text>
+<path d="M 610 83 C 706 83, 706 183, 610 183" fill="none" stroke="#d97706" stroke-width="1.9" marker-end="url(#dep-arrow)"/>
+      <text x="679.12" y="129" text-anchor="middle" font-size="9" fill="#d97706">状态词表</text>
+<g opacity="0.45">
+        <rect x="24" y="300" width="150" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="37" cy="315" r="3.5" fill="#0969da"/>
+        <text x="46" y="319" font-size="11.5" fill="#1f2328">会话结构化插件</text>
+        <text x="46" y="334" font-size="9.5" fill="#0969da">进行中</text>
+      </g>
+<g opacity="0.45">
+        <rect x="250" y="120" width="130" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="263" cy="135" r="3.5" fill="#1a7f37"/>
+        <text x="272" y="139" font-size="11.5" fill="#1f2328">用户面</text>
+        <text x="272" y="154" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<g opacity="0.45">
+        <rect x="250" y="360" width="130" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="263" cy="375" r="3.5" fill="#0969da"/>
+        <text x="272" y="379" font-size="11.5" fill="#1f2328">AI 面</text>
+        <text x="272" y="394" font-size="9.5" fill="#0969da">进行中</text>
+      </g>
+<g opacity="0.45">
+        <rect x="250" y="600" width="130" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="263" cy="615" r="3.5" fill="#1a7f37"/>
+        <text x="272" y="619" font-size="11.5" fill="#1f2328">共享底座</text>
+        <text x="272" y="634" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<g opacity="1">
+        <rect x="470" y="60" width="140" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="483" cy="75" r="3.5" fill="#1a7f37"/>
+        <text x="492" y="79" font-size="11.5" fill="#1f2328">节点状态</text>
+        <text x="492" y="94" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<g opacity="1">
+        <rect x="470" y="160" width="140" height="46" rx="6" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+        <circle cx="483" cy="175" r="3.5" fill="#1a7f37"/>
+        <text x="492" y="179" font-size="11.5" fill="#1f2328">分支溯源</text>
+        <text x="492" y="194" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<g opacity="0.45">
+        <rect x="470" y="260" width="140" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <text x="479" y="279" font-size="11" fill="#b91c1c">★</text>
+        <text x="492" y="279" font-size="11.5" fill="#1f2328">呈现</text>
+        <text x="492" y="294" font-size="9.5" fill="#0969da">进行中</text>
+      </g>
+<g opacity="0.45">
+        <rect x="470" y="360" width="140" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="483" cy="375" r="3.5" fill="#1a7f37"/>
+        <text x="492" y="379" font-size="11.5" fill="#1f2328">每轮注入</text>
+        <text x="492" y="394" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<g opacity="0.45">
+        <rect x="470" y="460" width="140" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="483" cy="475" r="3.5" fill="#1a7f37"/>
+        <text x="492" y="479" font-size="11.5" fill="#1f2328">压缩后重注</text>
+        <text x="492" y="494" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<g opacity="0.45">
+        <rect x="470" y="600" width="140" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="483" cy="615" r="3.5" fill="#1a7f37"/>
+        <text x="492" y="619" font-size="11.5" fill="#1f2328">拆解结构</text>
+        <text x="492" y="634" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<g opacity="0.45">
+        <rect x="470" y="700" width="140" height="46" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+        <circle cx="483" cy="715" r="3.5" fill="#1a7f37"/>
+        <text x="492" y="719" font-size="11.5" fill="#1f2328">持久化</text>
+        <text x="492" y="734" font-size="9.5" fill="#1a7f37">已完成</text>
+      </g>
+<text x="24" y="736" font-size="10" fill="#6b7280">★ 当前在做的节点 · 蓝框为选中节点 · 它的上游（节点状态）一起点亮，其余变暗</text>
+</svg>

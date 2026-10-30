@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="760" viewBox="0 0 520 760" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+<defs>
+  <marker id="dep-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L8,4 L0,8 Z" fill="#d97706"/>
+  </marker>
+</defs>
+<rect width="520" height="760" fill="#f6f8fa"/>
+<rect x="0.5" y="0.5" width="519" height="759" fill="#ffffff" stroke="#d0d7de"/>
+<text x="16" y="26" font-size="13.5" font-weight="650" fill="#1f2328">任务图谱</text>
+<text x="392" y="26" font-size="10.5" fill="#6b7280">[树] [进展] [依赖图]</text>
+<line x1="0" y1="40" x2="520" y2="40" stroke="#d0d7de"/>
+<text x="16" y="58" font-size="12" font-weight="600" fill="#1f2328">会话结构化插件</text>
+<text x="132" y="58" font-size="10.5" fill="#6b7280">62% · 8/13</text>
+<text x="16" y="74" font-size="10.5" fill="#6b7280">长对话里人和 AI 会丢失同一批东西：任务原本要做什么、现在做到哪、为什么分支。</text>
+<rect x="16" y="82" width="488" height="3" rx="1.5" fill="#eaeef2"/>
+<rect x="16" y="82" width="303" height="3" rx="1.5" fill="#1a7f37"/>
+<line x1="0" y1="92" x2="520" y2="92" stroke="#d0d7de"/>
+<circle cx="18" cy="104" r="4" fill="#0969da"/>
+      <text x="30" y="108" font-size="12" fill="#24292f">会话结构化插件</text>
+      <text x="462" y="107" font-size="10" fill="#0969da">进行中</text>
+<circle cx="34" cy="130" r="4" fill="#1a7f37"/>
+      <text x="46" y="134" font-size="12" fill="#24292f">用户面</text>
+      <text x="462" y="133" font-size="10" fill="#1a7f37">已完成</text>
+<circle cx="50" cy="156" r="4" fill="#1a7f37"/>
+      <text x="62" y="160" font-size="12" fill="#24292f">节点状态</text>
+      <text x="462" y="159" font-size="10" fill="#1a7f37">已完成</text>
+<circle cx="50" cy="182" r="4" fill="#1a7f37"/>
+      <text x="62" y="186" font-size="12" fill="#24292f">分支溯源</text>
+      <text x="462" y="185" font-size="10" fill="#1a7f37">已完成</text>
+<text x="46" y="212" font-size="13" fill="#b91c1c">★</text>
+      <text x="62" y="212" font-size="12" fill="#1f2328">呈现：右侧栏一眼看见全貌</text>
+      <text x="462" y="211" font-size="10" fill="#0969da">进行中</text>
+<circle cx="34" cy="234" r="4" fill="#0969da"/>
+      <text x="46" y="238" font-size="12" fill="#24292f">AI 面</text>
+      <text x="462" y="237" font-size="10" fill="#0969da">进行中</text>
+<circle cx="50" cy="260" r="4" fill="#0969da"/>
+      <text x="62" y="264" font-size="12" fill="#24292f">给 AI 的主线保持</text>
+      <text x="424" y="263" font-size="10" fill="#6b7280">⇢2</text><text x="462" y="263" font-size="10" fill="#0969da">进行中</text>
+<circle cx="66" cy="286" r="4" fill="#1a7f37"/>
+      <text x="78" y="290" font-size="12" fill="#24292f">每轮开头自动注入</text>
+      <text x="462" y="289" font-size="10" fill="#1a7f37">已完成</text>
+<circle cx="66" cy="312" r="4" fill="#1a7f37"/>
+      <text x="78" y="316" font-size="12" fill="#24292f">压缩之后重注</text>
+      <text x="462" y="315" font-size="10" fill="#1a7f37">已完成</text>
+<circle cx="34" cy="338" r="4" fill="#1a7f37"/>
+      <text x="46" y="342" font-size="12" fill="#24292f">共享底座</text>
+      <text x="462" y="341" font-size="10" fill="#1a7f37">已完成</text>
+<circle cx="50" cy="364" r="4" fill="#1a7f37"/>
+      <text x="62" y="368" font-size="12" fill="#24292f">任务拆解</text>
+      <text x="424" y="367" font-size="10" fill="#6b7280">⇢1</text><text x="462" y="367" font-size="10" fill="#1a7f37">已完成</text>
+<line x1="0" y1="388" x2="520" y2="388" stroke="#d0d7de"/>
+<rect x="16" y="396" width="488" height="196" rx="6" fill="#ffffff" stroke="#d0d7de"/>
+<text x="28" y="416" font-size="12.5" font-weight="600" fill="#1f2328">呈现：右侧栏一眼看见全貌</text>
+<text x="222" y="416" font-size="10.5" fill="#0969da">进行中</text>
+<text x="28" y="432" font-size="10.5" fill="#6b7280">核心产出（2）</text>
+<text x="28" y="448" font-size="10.5" fill="#6b7280">URL</text>
+<text x="58" y="448" font-size="10.5" fill="#1f2328">分析终端</text>
+<text x="112" y="448" font-size="10.5" fill="#0969da">http://127.0.0.1:8511/</text>
+<text x="28" y="464" font-size="10.5" fill="#6b7280">FILE</text>
+<text x="58" y="464" font-size="10.5" fill="#1f2328">月度复盘报告   D:\产出\报告.md</text>
+<text x="292" y="464" font-size="10" fill="#6b7280">[复制路径]</text>
+<text x="28" y="488" font-size="10.5" fill="#6b7280">本节点前置依赖（2）</text>
+<circle cx="34" cy="502" r="3.5" fill="#1a7f37"/>
+<text x="44" y="506" font-size="10.5" fill="#1a7f37">节点状态</text>
+<text x="96" y="506" font-size="10" fill="#6b7280">已完成 · 需要：状态词表</text>
+<circle cx="34" cy="520" r="3.5" fill="#0969da"/>
+<text x="44" y="524" font-size="10.5" fill="#0969da">分支溯源</text>
+<text x="96" y="524" font-size="10" fill="#6b7280">进行中 · 需要：节点直系父链</text>
+<text x="28" y="548" font-size="10.5" fill="#6b7280">开工条件 2 项 · 已满足</text>
+<rect x="28" y="558" width="132" height="22" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
+<text x="46" y="573" font-size="10.5" fill="#1f2328">从这里继续</text>
+<text x="170" y="573" font-size="10" fill="#6b7280">把这个节点发进当前会话</text>
+</svg>
